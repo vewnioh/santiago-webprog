@@ -5,6 +5,22 @@ import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 import { DataGrid } from '@mui/x-data-grid';
 import StarRateIcon from '@mui/icons-material/StarRate';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+const venues = [
+  { id: 1, name: 'Vault Cinema · Makati',   pos: [14.5547, 121.0244], showing: 'Whiplash' },
+  { id: 2, name: 'Reel House · BGC',        pos: [14.5507, 121.0510], showing: 'The Martian' },
+  { id: 3, name: 'Marquee · Quezon City',   pos: [14.6488, 121.0509], showing: 'Dead Poets Society' },
+  { id: 4, name: 'Lumière · Pasay',         pos: [14.5378, 120.9819], showing: 'Oblivion' },
+];
 
 const card = {
   p: 2.5, pl: 3, position: 'relative', overflow: 'hidden', transition: 'border-color .25s, transform .25s',
@@ -155,6 +171,34 @@ const DashboardPage = () => {
               disableRowSelectionOnClick
             />
           </Box>
+        </Grid>
+
+        <Grid size={12}>
+          <Paper sx={card}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
+              <Box>
+                <SectionLabel reel="03">On The Map</SectionLabel>
+                <Typography variant="h6" sx={{ mt: 0.5 }}>Screening Venues</Typography>
+              </Box>
+              <Typography variant="caption" color="text.secondary" sx={num}>{venues.length} locations · Metro Manila</Typography>
+            </Stack>
+            <Box sx={{ height: 360, borderRadius: 1, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+              <MapContainer center={[14.5847, 121.0244]} zoom={11} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {venues.map((v) => (
+                  <Marker key={v.id} position={v.pos}>
+                    <Popup>
+                      <strong>{v.name}</strong><br />
+                      Now showing: {v.showing}
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+            </Box>
+          </Paper>
         </Grid>
       </Grid>
     </Box>
