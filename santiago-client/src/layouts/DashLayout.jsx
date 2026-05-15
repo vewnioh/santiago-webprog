@@ -14,6 +14,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import PeopleIcon from '@mui/icons-material/People';
+import ArticleIcon from '@mui/icons-material/Article';
 
 const drawerWidth = 240;
 const AMBER = '#fbbf24';
@@ -128,11 +129,29 @@ const DashLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const navItems = [
+  const firstName = localStorage.getItem('firstName') || 'User';
+  const userType = localStorage.getItem('type') || '';
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('firstName');
+    localStorage.removeItem('type');
+    navigate('/auth/signin');
+  };
+
+  const allNavItems = [
     { label: 'Dashboard', to: '/dashboard', icon: <DashboardIcon /> },
     { label: 'Reports', to: '/dashboard/reports', icon: <AssessmentIcon /> },
-    { label: 'Users', to: '/dashboard/users', icon: <PeopleIcon /> },
+    { label: 'Articles', to: '/dashboard/articles', icon: <ArticleIcon /> },
+    { label: 'Users', to: '/dashboard/users', icon: <PeopleIcon />, adminOnly: true },
   ];
+
+  // Enhancement 1: editors cannot see the Users nav item
+  const navItems = allNavItems.filter((item) => {
+    if (item.adminOnly && userType === 'editor') return false;
+    return true;
+  });
+
   const currentLabel = navItems.find((n) => n.to === location.pathname)?.label || 'Dashboard';
 
   return (
@@ -149,6 +168,9 @@ const DashLayout = () => {
               <Typography variant="overline" color="primary">/</Typography>
               <Typography variant="overline" sx={{ color: 'text.primary' }}>{currentLabel}</Typography>
             </Stack>
+            <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
+              Welcome, {firstName}
+            </Typography>
             <Box sx={{ position: 'relative', display: { xs: 'none', sm: 'block' } }}>
               <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', pl: 1.5, pointerEvents: 'none', color: 'text.secondary' }}>
                 <SearchIcon fontSize="small" />
@@ -161,7 +183,7 @@ const DashLayout = () => {
                 '&:focus-within': { borderColor: 'primary.main', width: 280 },
               }} />
             </Box>
-            <Button color="inherit" variant="outlined" onClick={() => navigate('/')}
+            <Button color="inherit" variant="outlined" onClick={handleLogout}
               startIcon={<LogoutIcon sx={{ fontSize: 16 }} />}
               sx={{
                 borderColor: 'divider', color: 'text.secondary',

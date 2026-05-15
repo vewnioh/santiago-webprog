@@ -10,11 +10,17 @@ const ArticleList = ({ articles }) => {
         >
           {/* Thumbnail */}
           <div className="aspect-[4/3] overflow-hidden bg-neutral-800">
-            <img
-              src={article.image}
-              alt={article.title}
-              className="h-full w-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500"
-            />
+            {article.image ? (
+              <img
+                src={article.image}
+                alt={article.title}
+                className="h-full w-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-800 to-neutral-900">
+                <span className="font-mono text-xs uppercase tracking-widest text-neutral-600">No Image</span>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col flex-1 p-5">
@@ -42,7 +48,7 @@ const ArticleList = ({ articles }) => {
 
             {/* Excerpt */}
             <p className="mt-3 grow text-xs leading-6 text-neutral-500">
-              {article.content[0].substring(0, 110)}...
+              {(article.content?.[0] || article.preview || '').substring(0, 110)}…
             </p>
 
             {/* Rating bar */}
@@ -55,7 +61,7 @@ const ArticleList = ({ articles }) => {
 
             {/* Link */}
             <Link
-              to={index === articles.length - 1 ? '/page-not-found' : `/articles/${article.name}`}
+              to={`/articles/${article.name || article.slug}`}
               className="mt-4 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500 hover:text-amber-400 transition-colors"
             >
               Read Review

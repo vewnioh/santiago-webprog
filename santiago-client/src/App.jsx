@@ -11,6 +11,7 @@ import SignUpPage from './pages/AuthPages/SignupPage';
 import DashboardPage from './pages/DashboardPages/DashboardPage';
 import ReportsPage from './pages/DashboardPages/ReportsPage';
 import UsersPage from './pages/DashboardPages/UsersPage';
+import DashArticleListPage from './pages/DashboardPages/DashArticleListPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const routes = [
@@ -64,6 +65,10 @@ const routes = [
       {
         path: 'reports',
         element: <ReportsPage />,
+      },
+      {
+        path: 'articles',
+        element: <DashArticleListPage />,
       },
       {
         path: 'users',
