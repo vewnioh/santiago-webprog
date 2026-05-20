@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Alert, Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
@@ -61,7 +61,7 @@ const UsersPage = () => {
   }, [navigate]);
 
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState('');
   const [modal, setModal] = useState({ open: false, id: null });
   const [form, setForm] = useState(blankForm);
@@ -73,8 +73,7 @@ const UsersPage = () => {
   const [genderFilter, setGenderFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const loadUsers = async () => {
-    setLoading(true);
+  const loadUsers = useCallback(async () => {
     try {
       const { data } = await fetchUsers();
       setUsers(
@@ -86,9 +85,17 @@ const UsersPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { loadUsers(); }, []);
+  useEffect(() => {
+    fetchUsers()
+      .then(({ data }) => {
+        setUsers((data.users || []).map((u) => ({ ...u, id: u._id })));
+        setApiError('');
+      })
+      .catch(() => setApiError('Unable to load users from the server. Make sure the backend is running.'))
+      .finally(() => setLoading(false));
+  }, []);
 
   const openModal = (user) => {
     setModal({ open: true, id: user?._id ?? null });
@@ -197,6 +204,16 @@ const UsersPage = () => {
       await loadUsers();
     } catch {
       setApiError('Failed to update user status.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    try {
+      await deleteUser(id);
+      await loadUsers();
+    } catch {
+      setApiError('Failed to delete user.');
     }
   };
 

@@ -156,7 +156,7 @@ const DashLayout = () => {
 
   return (
     <ThemeProvider theme={dashTheme}>
-      <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Box sx={{ display: 'flex', minHeight: '100vh', maxWidth: '100vw', overflow: 'hidden', bgcolor: 'background.default' }}>
         <CssBaseline />
         <AppBar position="fixed" open={open} elevation={0}>
           <Toolbar sx={{ gap: 2 }}>
@@ -250,7 +250,7 @@ const DashLayout = () => {
           </List>
         </Drawer>
 
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Box component="main" sx={{ flexGrow: 1, p: 3, minWidth: 0, overflow: 'hidden' }}>
           <Toolbar />
           <Outlet />
         </Box>
