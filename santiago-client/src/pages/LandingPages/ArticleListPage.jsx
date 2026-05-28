@@ -55,45 +55,48 @@ const ArticleListPage = () => {
           <div className="mx-auto max-w-7xl">
             <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-600">Featured Review</p>
 
-            <Link to={`/articles/${featured.name || featured.slug}`} className="group block">
-              <article className="relative overflow-hidden rounded-2xl border border-neutral-800 group-hover:border-neutral-700 transition-colors duration-300 min-h-[420px] flex items-end">
-                {featured.image ? (
-                  <img
-                    src={featured.image}
-                    alt={featured.title}
-                    className="absolute inset-0 h-full w-full object-cover opacity-50 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-900" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/60 to-transparent" />
+            {(() => {
+              const inner = (
+                <article className="relative overflow-hidden rounded-2xl border border-neutral-800 group-hover:border-neutral-700 transition-colors duration-300 min-h-[420px] flex items-end">
+                  {featured.image ? (
+                    <img
+                      src={featured.image}
+                      alt={featured.title}
+                      className="absolute inset-0 h-full w-full object-cover opacity-50 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-900" />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/60 to-transparent" />
 
-                <div className="relative z-10 w-full p-8 lg:p-10">
-                  <div className="flex flex-wrap items-center gap-4 mb-4">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-amber-400">{featured.genre}</span>
-                    <span className="text-neutral-600 text-xs">·</span>
-                    <span className="text-xs text-neutral-500">dir. {featured.director}</span>
-                    <span className="text-neutral-600 text-xs">·</span>
-                    <span className="text-xs text-neutral-500">{featured.year}</span>
-                    <span className="ml-auto text-sm font-bold text-amber-400 tabular-nums">
-                      {featured.rating}<span className="text-neutral-600 font-normal text-xs"> / 10</span>
-                    </span>
+                  <div className="relative z-10 w-full p-8 lg:p-10">
+                    <div className="flex flex-wrap items-center gap-4 mb-4">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-amber-400">{featured.genre}</span>
+                      <span className="text-neutral-600 text-xs">·</span>
+                      <span className="text-xs text-neutral-500">dir. {featured.director}</span>
+                      <span className="text-neutral-600 text-xs">·</span>
+                      <span className="text-xs text-neutral-500">{featured.year}</span>
+                      <span className="ml-auto text-sm font-bold text-amber-400 tabular-nums">
+                        {featured.rating}<span className="text-neutral-600 font-normal text-xs"> / 10</span>
+                      </span>
+                    </div>
+
+                    <h2 className="max-w-2xl text-3xl font-bold leading-tight text-white sm:text-4xl">
+                      {featured.title}
+                    </h2>
+
+                    <p className="mt-4 max-w-xl text-sm leading-7 text-neutral-400">
+                      {(featured.content?.[0] || featured.preview || '').substring(0, 200)}…
+                    </p>
+
+                    <div className="mt-6 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400 group-hover:text-amber-400 transition-colors">
+                      Read Full Review <span className="text-base">→</span>
+                    </div>
                   </div>
-
-                  <h2 className="max-w-2xl text-3xl font-bold leading-tight text-white sm:text-4xl">
-                    {featured.title}
-                  </h2>
-
-                  <p className="mt-4 max-w-xl text-sm leading-7 text-neutral-400">
-                    {(featured.content?.[0] || featured.preview || '').substring(0, 200)}…
-                  </p>
-
-                  <div className="mt-6 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400 group-hover:text-amber-400 transition-colors">
-                    Read Full Review <span className="text-base">→</span>
-                  </div>
-                </div>
-              </article>
-            </Link>
+                </article>
+              );
+              return <Link to={`/articles/${featured.name || featured._id}`} className="group block">{inner}</Link>;
+            })()}
           </div>
         </section>
       )}

@@ -36,4 +36,24 @@ const deleteArticle = async (req, res) => {
   }
 };
 
-module.exports = { getArticles, createArticle, updateArticle, deleteArticle };
+const getArticleBySlug = async (req, res) => {
+  try {
+    const article = await Article.findOne({ slug: req.params.slug });
+    if (!article) return res.status(404).json({ message: 'Article not found' });
+    res.json(article);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getArticleById = async (req, res) => {
+  try {
+    const article = await Article.findById(req.params.id);
+    if (!article) return res.status(404).json({ message: 'Article not found' });
+    res.json(article);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getArticles, getArticleBySlug, getArticleById, createArticle, updateArticle, deleteArticle };

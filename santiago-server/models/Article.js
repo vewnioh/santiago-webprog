@@ -9,6 +9,7 @@ const articleSchema = new mongoose.Schema({
   rating: { type: Number, required: true, min: 0, max: 10 },
   paragraphs: { type: Number, default: 0 },
   preview: { type: String, default: '' },
+  image: { type: String, default: '' },
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 

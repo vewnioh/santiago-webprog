@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Button from '../../components/Button';
-import articles from '../../assets/article-content.js';
+import staticArticles from '../../assets/article-content.js';
+import { fetchArticleBySlug, fetchArticleById } from '../../services/ArticleService';
 
 function getReadTime(content) {
   const words = content.join(' ').split(/\s+/).length;
@@ -9,7 +11,35 @@ function getReadTime(content) {
 
 function ArticlePage() {
   const { name } = useParams();
-  const article = articles.find((a) => a.name === name);
+
+  const staticArticle = staticArticles.find((a) => a.name === name);
+  const isObjectId = /^[0-9a-f]{24}$/i.test(name);
+
+  const [dbArticle, setDbArticle] = useState(null);
+  const [loading, setLoading] = useState(!staticArticle);
+
+  useEffect(() => {
+    if (staticArticle) return;
+    const fetcher = isObjectId ? fetchArticleById(name) : fetchArticleBySlug(name);
+    fetcher
+      .then(({ data }) => setDbArticle(data))
+      .catch(() => setDbArticle(null))
+      .finally(() => setLoading(false));
+  }, [name, staticArticle, isObjectId]);
+
+  const article = staticArticle ?? dbArticle;
+
+  if (loading) {
+    return (
+      <div className="flex w-full flex-col">
+        <section className="border-b border-neutral-800 bg-neutral-950 px-6 py-14 lg:px-12">
+          <div className="mx-auto max-w-3xl">
+            <p className="text-neutral-500 text-sm">Loading…</p>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   if (!article) {
     return (
@@ -24,7 +54,8 @@ function ArticlePage() {
     );
   }
 
-  const readTime = getReadTime(article.content);
+  const content = article.content ?? (article.preview ? [article.preview] : []);
+  const readTime = getReadTime(content.length ? content : ['']);
 
   return (
     <div className="flex w-full flex-col">
@@ -83,17 +114,19 @@ function ArticlePage() {
       </section>
 
       {/* HERO IMAGE */}
-      <section className="border-b border-neutral-800 bg-neutral-900 px-6 py-10 lg:px-12">
-        <div className="mx-auto max-w-7xl">
-          <div className="overflow-hidden rounded-2xl border border-neutral-800">
-            <img
-              src={article.image}
-              alt={article.title}
-              className="w-full h-[420px] object-cover opacity-75"
-            />
+      {article.image && (
+        <section className="border-b border-neutral-800 bg-neutral-900 px-6 py-10 lg:px-12">
+          <div className="mx-auto max-w-7xl">
+            <div className="overflow-hidden rounded-2xl border border-neutral-800">
+              <img
+                src={article.image}
+                alt={article.title}
+                className="w-full h-[420px] object-cover opacity-75"
+              />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CONTENT */}
       <section className="border-b border-neutral-800 bg-neutral-950 px-6 py-14 lg:px-12">
@@ -103,11 +136,13 @@ function ArticlePage() {
           <div className="lg:col-span-2">
             <h2 className="mb-8 text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-600">Full Review</h2>
             <div className="space-y-7">
-              {article.content.map((paragraph, index) => (
-                <p key={index} className="text-[15px] leading-8 text-neutral-400 first-letter:text-3xl first-letter:font-bold first-letter:text-white first-letter:float-left first-letter:mr-2 first-letter:leading-none" style={index === 0 ? {} : {}}>
+              {content.length > 0 ? content.map((paragraph, index) => (
+                <p key={index} className="text-[15px] leading-8 text-neutral-400 first-letter:text-3xl first-letter:font-bold first-letter:text-white first-letter:float-left first-letter:mr-2 first-letter:leading-none">
                   {paragraph}
                 </p>
-              ))}
+              )) : (
+                <p className="text-sm text-neutral-600">No review content available yet.</p>
+              )}
             </div>
             <div className="mt-10 pt-6 border-t border-neutral-800">
               <Button to="/articles">← Back to Reviews</Button>

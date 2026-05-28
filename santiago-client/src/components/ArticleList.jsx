@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 const ArticleList = ({ articles }) => {
   return (
     <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-      {articles.map((article, index) => (
+      {articles.map((article, ) => (
         <article
-          key={article.name}
+          key={article._id || article.name}
           className="group flex flex-col rounded-xl border border-neutral-800 bg-neutral-900 overflow-hidden hover:border-neutral-700 transition-colors duration-300"
         >
           {/* Thumbnail */}
@@ -61,7 +61,7 @@ const ArticleList = ({ articles }) => {
 
             {/* Link */}
             <Link
-              to={`/articles/${article.name || article.slug}`}
+              to={`/articles/${article.name || article._id}`}
               className="mt-4 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-500 hover:text-amber-400 transition-colors"
             >
               Read Review

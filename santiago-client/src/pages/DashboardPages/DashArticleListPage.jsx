@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
   Divider, Grid, InputAdornment, MenuItem, Paper, Stack, TextField, Typography, useMediaQuery,
@@ -8,7 +8,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import { fetchArticles, createArticle, updateArticle, deleteArticle } from '../../services/ArticleService';
+import { fetchArticles, createArticle, updateArticle,} from '../../services/ArticleService';
 
 const card = {
   p: 2.5, pl: 3, position: 'relative', overflow: 'hidden', transition: 'border-color .25s',
@@ -27,6 +27,7 @@ const blankForm = {
   rating: '',
   paragraphs: '',
   preview: '',
+  image: '',
   isActive: true,
 };
 
@@ -44,7 +45,7 @@ const DashArticleListPage = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const loadArticles = async () => {
+  const loadArticles = useCallback(async () => {
     setLoading(true);
     try {
       const { data } = await fetchArticles();
@@ -57,9 +58,10 @@ const DashArticleListPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { loadArticles(); }, []);
+  // eslint-disable-next-line
+  useEffect(() => { loadArticles(); }, [loadArticles]);
 
   const openModal = (article) => {
     setModal({ open: true, id: article?._id ?? null });
@@ -72,6 +74,7 @@ const DashArticleListPage = () => {
       rating: String(article.rating),
       paragraphs: String(article.paragraphs ?? ''),
       preview: article.preview ?? '',
+      image: article.image ?? '',
       isActive: article.isActive,
     } : { ...blankForm });
     setErrors({});
@@ -83,8 +86,15 @@ const DashArticleListPage = () => {
     setErrors({});
   };
 
+  const toSlug = (str) =>
+    str.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
   const handleChange = ({ target: { name, value } }) => {
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+      const next = { ...prev, [name]: value };
+      if (name === 'title' && !modal.id) next.slug = toSlug(value);
+      return next;
+    });
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
@@ -104,6 +114,9 @@ const DashArticleListPage = () => {
     if (!next.rating) {
       const r = Number(form.rating);
       if (isNaN(r) || r < 0 || r > 10) next.rating = 'Rating must be between 0 and 10.';
+    }
+    if (!next.slug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(form.slug)) {
+      next.slug = 'Slug must be lowercase letters, numbers, and hyphens only (e.g. my-movie-2024).';
     }
     if (!next.slug && articles.some((a) => a.slug === form.slug && a._id !== modal.id)) {
       next.slug = 'Slug already exists.';
@@ -125,6 +138,7 @@ const DashArticleListPage = () => {
       rating: Number(form.rating),
       paragraphs: Number(form.paragraphs) || 0,
       preview: form.preview.trim(),
+      image: form.image.trim(),
       isActive: form.isActive,
     };
 
@@ -357,7 +371,7 @@ const DashArticleListPage = () => {
             {errors.submit && <Alert severity="error" sx={{ mb: 2 }}>{errors.submit}</Alert>}
             <Stack spacing={2} sx={{ pt: 1 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField {...fieldProps('slug', 'Slug')} />
+                <TextField {...fieldProps('slug', 'Slug', { placeholder: 'e.g. my-movie-2024', helperText: errors.slug || 'Auto-generated from title. Lowercase, hyphens only.' })} />
                 <TextField {...fieldProps('title', 'Title')} />
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -370,6 +384,20 @@ const DashArticleListPage = () => {
                 <TextField {...fieldProps('paragraphs', 'Paragraphs', { inputMode: 'numeric' })} />
               </Stack>
               <TextField {...fieldProps('preview', 'Preview Text', { multiline: true, rows: 3 })} />
+              <Box>
+                <TextField {...fieldProps('image', 'Image URL', { placeholder: 'https://example.com/poster.jpg' })} />
+                {form.image && (
+                  <Box sx={{ mt: 1, borderRadius: 1, overflow: 'hidden', border: '1px solid', borderColor: 'divider', maxHeight: 160 }}>
+                    <Box
+                      component="img"
+                      src={form.image}
+                      alt="Preview"
+                      sx={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }}
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  </Box>
+                )}
+              </Box>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <Typography variant="body2" color="text.secondary">Status:</Typography>
                 <Chip
