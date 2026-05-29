@@ -4,7 +4,7 @@ import AuthLayout from './layouts/AuthLayout';
 import DashLayout from './layouts/DashLayout';
 import HomePage from './pages/LandingPages/HomePage';
 import AboutPage from './pages/LandingPages/AboutPage';
-import ArticlelistPage from './pages/LandingPages/ArticlelistPage';
+import ArticleListPage from './pages/LandingPages/ArticleListPage';
 import ArticlePage from './pages/LandingPages/ArticlePage';
 import SignInPage from './pages/AuthPages/SignInPage';
 // FIXED: Changed 'SignupPage' to 'SignUpPage' to match your actual file case exactly
@@ -31,7 +31,7 @@ const routes = [
       },
       {
         path: 'articles',
-        element: <ArticlelistPage />,
+        element: <ArticleListPage />,
       },
       {
         path: 'articles/:name',
