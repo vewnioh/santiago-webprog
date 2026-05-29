@@ -7,7 +7,8 @@ import AboutPage from './pages/LandingPages/AboutPage';
 import ArticlelistPage from './pages/LandingPages/ArticlelistPage';
 import ArticlePage from './pages/LandingPages/ArticlePage';
 import SignInPage from './pages/AuthPages/SignInPage';
-import SignUpPage from './pages/AuthPages/SignupPage';
+// FIXED: Changed 'SignupPage' to 'SignUpPage' to match your actual file case exactly
+import SignUpPage from './pages/AuthPages/SignUpPage'; 
 import DashboardPage from './pages/DashboardPages/DashboardPage';
 import ReportsPage from './pages/DashboardPages/ReportsPage';
 import UsersPage from './pages/DashboardPages/UsersPage';
